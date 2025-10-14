@@ -88,6 +88,7 @@ Hosts begin on pasture 0 (housed), move to pasture 1 on day 7, and to pasture 2 
 
 Use the init.vals function sourced above to specify numbers of individuals of each life cycle stage on each pasture and in the host.
 Options and defaults are described in "Model_Functions/initialvalues.r". 
+    
     initial_values = init.vals(immunity_host = 0.01, Preadult_in_host = 2000, Adult_in_hostA = 8000)
   
 
