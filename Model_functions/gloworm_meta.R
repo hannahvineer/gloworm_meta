@@ -68,16 +68,16 @@
 #' @export
 
 gloworm_meta = function(start, end, lat, temp, precip, statevars,
-                   host, nematode,
-                   stocking_rate, graze, movements, kgDMha,
-                   DMI, lwt, faeces,
-                   eventdat = NULL) {
-
+                        host, nematode,
+                        stocking_rate, graze, movements, kgDMha,
+                        DMI, lwt, faeces,
+                        eventdat = NULL) {
+  
   # This code checks the lengths of environmental variables are correct and gets the species-specific parameters
   date.range = seq(as.Date(start), as.Date(end), "days")
   global.t = seq(1, length(date.range))
   photoperiod = daylength(lat = lat, doy = date.range)
-
+  
   # Check if weather data match length of simulation
   if (length(date.range) != length(temp))
     stop("Error: length of temperature data and dates do not match. Ensure climatic data correspond to the start and end dates (one entry per day)")
@@ -87,15 +87,15 @@ gloworm_meta = function(start, end, lat, temp, precip, statevars,
     stop("Error: length of stocking_rate variable and dates do not match. Ensure rates (animals per hectare) correspond to the start and end dates (one entry per day)")
   if (length(date.range) != length(kgDMha))
     stop("Error: length of kgDMha (herbage biomass) variable and dates do not match. Ensure biomass corresponds to the start and end dates (one entry per day)")
-
+  
   # The dry matter intake is converted to the proportion of available dry matter consumed each day (based on the user input value) and then to the daily instantaneous intake rate.
   DMI[is.nan(DMI)] = 0
   pDMI = (DMI/kgDMha)
   rDMI = -log(1-pDMI)
-
+  
   # Get GI nematode parameters (constant and forced variables)
   ginparms = gin(nematode = nematode, temp = temp, precip = precip, photoperiod = photoperiod)
-
+  
   # Interpolation functions for external forcing
   dry_matter_intake = approxfun(rDMI, method = "linear")
   # Create interpolation functions for the grazing locations
@@ -119,7 +119,7 @@ gloworm_meta = function(start, end, lat, temp, precip, statevars,
   vmigrate <- approxfun(x = ginparms$v.mig, method = "linear", rule = 2)
   hrate = approxfun(ginparms$hypobiosis, method = "linear")
   rrate = approxfun(ginparms$resume, method = 'linear')
-
+  
   parms = c(rho = ginparms$rho.response,
             sigma = ginparms$sigma.decay,
             dev2 = ginparms$dev.2,
@@ -130,62 +130,62 @@ gloworm_meta = function(start, end, lat, temp, precip, statevars,
             minmu8 = ginparms$min.mu8,
             minlambda = ginparms$min.lambda,
             maxlambda = ginparms$max.lambda)
-
-# Make sure you apply the egg correction (dessiccation) to eggs input as events too!
-for (i in 1:length(eventdat$value[which(eventdat$var=='E_A')])) {
-  eventdat$value[which(eventdat$var=='E_A')][i] = ginparms$egg.correction[which(eventdat$var=='E_A')][i]*eventdat$value[which(eventdat$var=='E_A')][i]
-}
-for (i in 1:length(eventdat$value[which(eventdat$var=='E_B')])) {
-  eventdat$value[which(eventdat$var=='E_B')][i] = ginparms$egg.correction[which(eventdat$var=='E_B')][i]*eventdat$value[which(eventdat$var=='E_B')][i]
-}
-for (i in 1:length(eventdat$value[which(eventdat$var=='E_C')])) {
-  eventdat$value[which(eventdat$var=='E_C')][i] = ginparms$egg.correction[which(eventdat$var=='E_C')][i]*eventdat$value[which(eventdat$var=='E_C')][i]
-}
-for (i in 1:length(eventdat$value[which(eventdat$var=='E_D')])) {
-  eventdat$value[which(eventdat$var=='E_D')][i] = ginparms$egg.correction[which(eventdat$var=='E_D')][i]*eventdat$value[which(eventdat$var=='E_D')][i]
-}
-for (i in 1:length(eventdat$value[which(eventdat$var=='E_E')])) {
-  eventdat$value[which(eventdat$var=='E_E')][i] = ginparms$egg.correction[which(eventdat$var=='E_E')][i]*eventdat$value[which(eventdat$var=='E_E')][i]
-}
-for (i in 1:length(eventdat$value[which(eventdat$var=='E_F')])) {
-  eventdat$value[which(eventdat$var=='E_F')][i] = ginparms$egg.correction[which(eventdat$var=='E_F')][i]*eventdat$value[which(eventdat$var=='E_F')][i]
-}
-
+  
+  # Make sure you apply the egg correction (dessiccation) to eggs input as events too!
+  for (i in 1:length(eventdat$value[which(eventdat$var=='E_A')])) {
+    eventdat$value[which(eventdat$var=='E_A')][i] = ginparms$egg.correction[which(eventdat$var=='E_A')][i]*eventdat$value[which(eventdat$var=='E_A')][i]
+  }
+  for (i in 1:length(eventdat$value[which(eventdat$var=='E_B')])) {
+    eventdat$value[which(eventdat$var=='E_B')][i] = ginparms$egg.correction[which(eventdat$var=='E_B')][i]*eventdat$value[which(eventdat$var=='E_B')][i]
+  }
+  for (i in 1:length(eventdat$value[which(eventdat$var=='E_C')])) {
+    eventdat$value[which(eventdat$var=='E_C')][i] = ginparms$egg.correction[which(eventdat$var=='E_C')][i]*eventdat$value[which(eventdat$var=='E_C')][i]
+  }
+  for (i in 1:length(eventdat$value[which(eventdat$var=='E_D')])) {
+    eventdat$value[which(eventdat$var=='E_D')][i] = ginparms$egg.correction[which(eventdat$var=='E_D')][i]*eventdat$value[which(eventdat$var=='E_D')][i]
+  }
+  for (i in 1:length(eventdat$value[which(eventdat$var=='E_E')])) {
+    eventdat$value[which(eventdat$var=='E_E')][i] = ginparms$egg.correction[which(eventdat$var=='E_E')][i]*eventdat$value[which(eventdat$var=='E_E')][i]
+  }
+  for (i in 1:length(eventdat$value[which(eventdat$var=='E_F')])) {
+    eventdat$value[which(eventdat$var=='E_F')][i] = ginparms$egg.correction[which(eventdat$var=='E_F')][i]*eventdat$value[which(eventdat$var=='E_F')][i]
+  }
+  
   # Get initial values
-
+  
   y = c(E_A = statevars$Eggs_plotA * ginparms$egg.correction[1],
         L_A = statevars$L1L2_plotA,
         L3f_A = statevars$L3faeces_plotA,
-        L3p_A = statevars$L3herbage_plotA * (1/ginparms$v.mig[1]),
+        L3p_A = ifelse(statevars$L3pasture_plotA>0, statevars$L3pasture_plotA, statevars$L3herbage_plotA * (1/ginparms$v.mig[1])),
         E_B = statevars$Eggs_plotB * ginparms$egg.correction[1],
         L_B = statevars$L1L2_plotB,
         L3f_B = statevars$L3faeces_plotB,
-        L3p_B = statevars$L3herbage_plotB * (1/ginparms$v.mig[1]),
+        L3p_B = ifelse(statevars$L3pasture_plotB>0, statevars$L3pasture_plotB, statevars$L3herbage_plotB * (1/ginparms$v.mig[1])),
         E_C = statevars$Eggs_plotC * ginparms$egg.correction[1],
         L_C = statevars$L1L2_plotC,
         L3f_C = statevars$L3faeces_plotC,
-        L3p_C = statevars$L3herbage_plotC * (1/ginparms$v.mig[1]),
+        L3p_C = ifelse(statevars$L3pasture_plotC>0, statevars$L3pasture_plotC, statevars$L3herbage_plotC * (1/ginparms$v.mig[1])),
         E_D = statevars$Eggs_plotD * ginparms$egg.correction[1],
         L_D = statevars$L1L2_plotD,
         L3f_D = statevars$L3faeces_plotD,
-        L3p_D = statevars$L3herbage_plotD * (1/ginparms$v.mig[1]),
+        L3p_D = ifelse(statevars$L3pasture_plotD>0, statevars$L3pasture_plotD, statevars$L3herbage_plotD * (1/ginparms$v.mig[1])),
         E_E = statevars$Eggs_plotE * ginparms$egg.correction[1],
         L_E = statevars$L1L2_plotE,
         L3f_E = statevars$L3faeces_plotE,
-        L3p_E = statevars$L3herbage_plotE * (1/ginparms$v.mig[1]),
+        L3p_E = ifelse(statevars$L3pasture_plotE>0, statevars$L3pasture_plotE, statevars$L3herbage_plotE * (1/ginparms$v.mig[1])),
         E_F = statevars$Eggs_plotF * ginparms$egg.correction[1],
         L_F = statevars$L1L2_plotF,
         L3f_F = statevars$L3faeces_plotF,
-        L3p_F = statevars$L3herbage_plotF * (1/ginparms$v.mig[1]),
+        L3p_F = ifelse(statevars$L3pasture_plotF>0, statevars$L3pasture_plotF, statevars$L3herbage_plotF * (1/ginparms$v.mig[1])),
         P = statevars$Preadult_in_hostA,
         Pa = statevars$Arrested_in_hostA,
         A = statevars$Adult_in_hostA,
         r = statevars$immunity_hostA)
-
+  
   gloworm_meta_mod = function (t, y, parms) {
-
+    
     with(as.list(c(y, parms)), {
-
+      
       # specify the parameter to take from the external forcing
       # climate dependant rates
       dev1 = dev1rate(t)
@@ -208,61 +208,61 @@ for (i in 1:length(eventdat$value[which(eventdat$var=='E_F')])) {
       gD = grazeD(t)
       gE = grazeE(t)
       gF = grazeF(t)
-
+      
       # Estimate immune-dependent parameters
       mu6 = minmu6+(maxmu6-minmu6)*r
       mu8 = minmu8+(maxmu8-minmu8)*r
       lambda = maxlambda+(minlambda-maxlambda)*r
       decay = sigma
-
+      
       # Calculate the derivatives
       # Freeliving (per unit area)
-
+      
       #Plot A
       dE_A = -(dev1 * 2 + mu1) * E_A + lambda*A*correction*stock.rate*gA
       dL_A = -(dev1 * 2 + mu2) * L_A + (dev1 * 2) * E_A
       dL3f_A = -(mu3 + m1) * L3f_A + (dev1 * 2) * L_A
       dL3p_A = -mu4 * (L3p_A * (1 - m2)) - mu5 * (L3p_A * m2) + m1 * L3f_A - (L3p_A * m2)*intake*stock.rate*gA
-
+      
       #Plot B
       dE_B = -(dev1 * 2 + mu1) * E_B + lambda*A*correction*stock.rate*gB
       dL_B = -(dev1 * 2 + mu2) * L_B + (dev1 * 2) * E_B
       dL3f_B = -(mu3 + m1) * L3f_B + (dev1 * 2) * L_B
       dL3p_B = -mu4 * (L3p_B * (1 - m2)) - mu5 * (L3p_B * m2) + m1 * L3f_B - (L3p_B * m2)*intake*stock.rate*gB
-
+      
       #Plot C
       dE_C = -(dev1 * 2 + mu1) * E_C + lambda*A*correction*stock.rate*gC
       dL_C = -(dev1 * 2 + mu2) * L_C + (dev1 * 2) * E_C
       dL3f_C = -(mu3 + m1) * L3f_C + (dev1 * 2) * L_C
       dL3p_C = -mu4 * (L3p_C * (1 - m2)) - mu5 * (L3p_C * m2) + m1 * L3f_C - (L3p_C * m2)*intake*stock.rate*gC
-
+      
       #Plot D
       dE_D = -(dev1 * 2 + mu1) * E_D + lambda*A*correction*stock.rate*gD
       dL_D = -(dev1 * 2 + mu2) * L_D + (dev1 * 2) * E_D
       dL3f_D = -(mu3 + m1) * L3f_D + (dev1 * 2) * L_D
       dL3p_D = -mu4 * (L3p_D * (1 - m2)) - mu5 * (L3p_D * m2) + m1 * L3f_D - (L3p_D * m2)*intake*stock.rate*gD
-
+      
       #Plot E
       dE_E = -(dev1 * 2 + mu1) * E_E + lambda*A*correction*stock.rate*gE
       dL_E = -(dev1 * 2 + mu2) * L_E + (dev1 * 2) * E_E
       dL3f_E = -(mu3 + m1) * L3f_E + (dev1 * 2) * L_E
       dL3p_E = -mu4 * (L3p_E * (1 - m2)) - mu5 * (L3p_E * m2) + m1 * L3f_E - (L3p_E * m2)*intake*stock.rate*gE
-
+      
       #Plot F
       dE_F = -(dev1 * 2 + mu1) * E_F + lambda*A*correction*stock.rate*gF
       dL_F = -(dev1 * 2 + mu2) * L_F + (dev1 * 2) * E_F
       dL3f_F = -(mu3 + m1) * L3f_F + (dev1 * 2) * L_F
       dL3p_F = -mu4 * (L3p_F * (1 - m2)) - mu5 * (L3p_F * m2) + m1 * L3f_F - (L3p_F * m2)*intake*stock.rate*gF
-
+      
       # Parasitic (per host)
-
+      
       dP = - dev2*P - mu6*P + L3p_A*m2*intake*gA + L3p_B*m2*intake*gB + L3p_C*m2*intake*gC + L3p_D*m2*intake*gD + L3p_E*m2*intake*gE + L3p_F*m2*intake*gF
       dPa = dev2*h*P  - (h2+mu7)*Pa
       dA = dev2*(1-h)*P  + h2*Pa - mu8*A
-
+      
       # Immunity
       dr = -r*decay + rho*(L3p_A*m2*intake*gA + L3p_B*m2*intake*gB + L3p_C*m2*intake*gC + L3p_D*m2*intake*gD + L3p_E*m2*intake*gE + L3p_F*m2*intake*gF)*(1-r)
-
+      
       return(list(c(dE_A = dE_A, dL_A = dL_A, dL3f_A = dL3f_A, dL3p_A = dL3p_A,
                     dE_B = dE_B, dL_B = dL_B, dL3f_B = dL3f_B, dL3p_B = dL3p_B,
                     dE_C = dE_C, dL_C = dL_C, dL3f_C = dL3f_C, dL3p_C = dL3p_C,
@@ -273,10 +273,10 @@ for (i in 1:length(eventdat$value[which(eventdat$var=='E_F')])) {
                     dr = dr)))
     })
   }
-
-
+  
+  
   sol = lsoda(y = y, times = global.t, func = gloworm_meta_mod, parms = parms, events = list(data = eventdat))
-
+  
   # Post hoc calculations
   fecundity = exp(ginparms$max.lambda-(ginparms$max.lambda-ginparms$min.lambda)*sol[,"r"])
   total.eggs = sol[,"A"]*fecundity
@@ -302,9 +302,9 @@ for (i in 1:length(eventdat$value[which(eventdat$var=='E_F')])) {
   L3h_F = sol[, "L3p_F"] * vmigrate(global.t)
   L3_per_kgDM_F = L3h_F/kgDMha
   L3i = ((sol[,'L3p_A']+sol[,'L3p_B']+sol[,'L3p_C']+sol[,'L3p_D']+sol[,'L3p_E']+sol[,'L3p_F']) * ginparms$v.mig)*pDMI*ginparms$grazing.correction
-
+  
   # Bind all data together
   sol = cbind(sol, L3s_A, L3h_A, L3_per_kgDM_A, L3s_B, L3h_B, L3_per_kgDM_B, L3s_C, L3h_C, L3_per_kgDM_C, L3s_D, L3h_D, L3_per_kgDM_D, L3s_E, L3h_E, L3_per_kgDM_E, L3s_F, L3h_F, L3_per_kgDM_F, L3i, preadult.mortality, adult.mortality, fecundity, total.eggs, FEC, lwt, DMI, faeces)
-
+  
   return(sol)
 }
