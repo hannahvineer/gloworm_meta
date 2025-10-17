@@ -27,8 +27,9 @@ init.vals = function(Eggs_plotA = 0, L1L2_plotA = 0, L3faeces_plotA = 0, L3herba
                      Eggs_plotE = 0, L1L2_plotE = 0, L3faeces_plotE = 0, L3herbage_plotE = 0,
                      Eggs_plotF = 0, L1L2_plotF = 0, L3faeces_plotF = 0, L3herbage_plotF = 0,
                      q = 0.01,
-                     Preadult_in_hostA = 0, Arrested_in_hostA = 0, Adult_in_hostA = 0, immunity_hostA = 0.0001) {
-
+                     Preadult_in_hostA = 0, Arrested_in_hostA = 0, Adult_in_hostA = 0, immunity_hostA = 0.0001,
+                     L3pasture_plotA = 0, L3pasture_plotB = 0, L3pasture_plotC = 0, L3pasture_plotD = 0, L3pasture_plotE = 0, L3pasture_plotF = 0) {
+  
   .init = cbind(Eggs_plotA, L1L2_plotA, L3faeces_plotA, L3herbage_plotA,
                 Eggs_plotB, L1L2_plotB, L3faeces_plotB, L3herbage_plotB,
                 Eggs_plotC, L1L2_plotC, L3faeces_plotC, L3herbage_plotC,
@@ -36,6 +37,7 @@ init.vals = function(Eggs_plotA = 0, L1L2_plotA = 0, L3faeces_plotA = 0, L3herba
                 Eggs_plotE, L1L2_plotE, L3faeces_plotE, L3herbage_plotE,
                 Eggs_plotF, L1L2_plotF, L3faeces_plotF, L3herbage_plotF,
                 q,
-                Preadult_in_hostA, Arrested_in_hostA, Adult_in_hostA, immunity_hostA)
+                Preadult_in_hostA, Arrested_in_hostA, Adult_in_hostA, immunity_hostA,
+                L3pasture_plotA, L3pasture_plotB, L3pasture_plotC, L3pasture_plotD, L3pasture_plotE, L3pasture_plotF)
   return(as.data.frame(.init))
 }
